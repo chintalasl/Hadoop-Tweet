@@ -1,0 +1,250 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>SentimentAnalysis</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="amcharts/amcharts.js" type="text/javascript"></script>
+<script src="amcharts/serial.js" type="text/javascript"></script>
+<script src="d3.js"></script>
+<script src="d3.layout.cloud.js"></script>
+
+<style type="text/css">
+    .bs-example{
+    	margin: 20px;
+    }
+</style>
+    <style type="text/css">
+      html, body, #map-canvas { height: 100%; margin: 0; padding: 0;}
+    </style>
+    <script type="text/javascript">
+    
+    //test='[{"Word":"Dec 2014","Number":44618.668},{"Word":"Jan 2014","Number":42949.965},{"Word":"July 2014 ","Number":42975.11},{"Word":"May 2014","Number":42597.484},{"Word":"Sept 2014","Number":43609.27}]';
+    test='[{"Word":"Dec 2014","Number":1},{"Word":"Jan 2014","Number":2}]';//",{"Word":"July 2014 ","Number":2975.11},{"Word":"May 2014","Number":2597.484},{"Word":"Sept 2014","Number":3609.27}]';
+    var chartData = [];
+    var chartData2 = JSON.parse(test);
+   /* chartData.forEach(function(c) {
+    	var date = c.Word;
+    	c.Word = new Date(date);
+    });*/
+    //console.log(chartData);
+    generateChartData();
+    autoLoadCloud();
+    var chart = AmCharts.makeChart("chartdiv", {
+        type: "serial",
+        pathToImages: "amcharts/images/",
+        dataProvider: chartData,
+        categoryField: "date",
+        categoryAxis: {
+            parseDates: true,
+            gridAlpha: 0.15,
+            minorGridEnabled: true,
+            axisColor: "#DADADA"
+        },
+        valueAxes: [{
+            axisAlpha: 0.2,
+            id: "v1"
+        }],
+        graphs: [{
+            title: "red line",
+            id: "g1",
+            valueAxis: "v1",
+            valueField: "visits",
+            bullet: "round",
+            bulletBorderColor: "#FFFFFF",
+            bulletBorderAlpha: 1,
+            lineThickness: 2,
+            lineColor: "#b5030d",
+            negativeLineColor: "#0352b5",
+            balloonText: "[[category]]<br><b><span style='font-size:14px;'>value: [[value]]</span></b>"
+        }],
+        chartCursor: {
+            fullWidth:true,
+            cursorAlpha:0.1
+        },
+        chartScrollbar: {
+            scrollbarHeight: 40,
+            color: "#FFFFFF",
+            autoGridCount: true,
+            graph: "g1"
+        },
+
+        mouseWheelZoomEnabled:true
+    });
+    
+    //chart.dataDateFormat = "MMM YYYY";
+
+    chart.addListener("dataUpdated", zoomChart);
+	//var nums=[44618,42949,42975,42597,43609];
+	
+    function generateChartData() {
+        var firstDate = new Date();
+        firstDate.setDate(firstDate.getDate() - 5);
+        var nums=[44618,42949,42975,42597,43609];
+        for (var i = 1; i <= 5; i++) {
+            // we create date objects here. In your data, you can have date strings
+            // and then set format of your dates using chart.dataDateFormat property,
+            // however when possible, use date objects, as this will speed up chart rendering.
+            var newDate = new Date(firstDate);
+            newDate.setDate(newDate.getDate() + i);
+
+            var visits = Number(nums[i-1]);//numMath.round(Math.random() * 40) - 20;
+
+            chartData.push({
+                date: newDate,
+                visits: visits
+            });
+        }
+    }
+    
+    test='[{"Word":"Dec 2014","Number":44618.668},{"Word":"Jan 2014","Number":42949.965},{"Word":"July 2014 ","Number":42975.11},{"Word":"May 2014","Number":42597.484},{"Word":"Sept 2014","Number":43609.27}]';
+    
+    // generate some random data, quite different range
+    function generateChartData2() {
+        var firstDate = new Date();
+        firstDate.setDate(firstDate.getDate() - 500);
+
+        for (var i = 0; i < 5; i++) {
+            // we create date objects here. In your data, you can have date strings
+            // and then set format of your dates using chart.dataDateFormat property,
+            // however when possible, use date objects, as this will speed up chart rendering.
+            var date = chartData.Word[i];
+            var visits = chartData.Number[i];
+            chartData.push({
+                date: newDate,
+                visits: visits
+            });
+        }
+    }
+
+    // this method is called when chart is first inited as we listen for "dataUpdated" event
+    function zoomChart() {
+        // different zoom methods can be used - zoomToIndexes, zoomToDates, zoomToCategoryValues
+        chart.zoomToIndexes(chartData.length +10, chartData.length - 1);
+    }
+
+    // changes cursor mode from pan to select
+    function setPanSelect() {
+        var chartCursor = chart.chartCursor;
+
+        if (document.getElementById("rb1").checked) {
+            chartCursor.pan = false;
+            chartCursor.zoomable = true;
+
+        } else {
+            chartCursor.pan = true;
+        }
+        chart.validateNow();
+    }
+    function loadGraph() {
+    	$("#wordG").hide();
+    	$("#Graph").show();
+    	  if ($("#WordCloud2").hasClass("active")) {
+       	  $("#WordCloud2").toggleClass("active");
+   	  } 
+    	  if (!$("#Loadgraph2").hasClass("active")) {
+           	  $("#Loadgraph2").toggleClass("active");
+       	  } 
+    	setPanSelect();
+    }
+    
+    function autoLoadCloud(){
+
+    	
+    }
+   
+
+    function loadCloud() {
+    	$("#Graph").hide();
+    	$("#wordG").show();
+    	 if ($("#Loadgraph2").hasClass("active")) {
+          	  $("#Loadgraph2").toggleClass("active");}
+    	 if (!$("#WordCloud2").hasClass("active")) {
+          	  $("#WordCloud2").toggleClass("active");
+      	  }     
+    	 var jWord = ["love",
+    	              "favorite",
+    	              "amazing",
+    	              "good",
+    	              "gracias",
+    	              "beautiful",
+    	              "perfect",
+    	              "congrats",
+    	              "awesome",
+    	              "happy",
+    	              "thank",
+    	              "nice",
+    	              "excited",
+    	              "greatest",
+    	              "incredible"];
+    	 var jCount = [15,14,13,12,11,10,9,8,7,6,5,4,3,2,1];
+    	 //d3.select("#wordG.svg").remove();
+    	 var fill = d3.scale.category20();
+    	 var maxCount = d3.max(jCount);
+    	 var s = d3.scale.linear().domain([10,50]).range([0, maxCount]);
+     	//.rotate(function() { return ~~(Math.random() * 2) * 90; })
+     	  d3.layout.cloud().size([300, 300])
+     	      .words(d3.zip(jWord, jCount).map(function(d) {
+     	        return {text: d[0], size: d[1]*5+10};
+     	      }))
+     	      .padding(5)
+     	      .rotate(function() { return (~~(Math.random() * 2) * 120)-60; })
+     	      .font("Impact")
+     	      .fontSize(function(d) { return d.size; })
+     	      .on("end", draw)
+     	      .start();
+     	 function draw(words) {
+     	    d3.select("#wordG").append("svg")
+     	        .attr("width", 300)
+     	        .attr("height", 300)
+     	      .append("g")
+     	        .attr("transform", "translate(150,150)")
+     	      .selectAll("text")
+     	        .data(words)
+     	      .enter().append("text")
+     	        .style("font-size", function(d) { return d.size + "px"; })
+     	        .style("font-family", "Impact")
+     	        .style("fill", function(d, i) { return fill(i); })
+     	        .attr("text-anchor", "middle")
+     	        .attr("transform", function(d) {
+     	          return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+     	        })
+     	        .text(function(d) { return d.text; });
+     	  }
+     	 
+    }
+    </script>
+  </head>
+  <body>
+ <div class="bs-example">
+    <nav role="navigation" class="navbar navbar-default">
+        <div class="navbar-header">
+            <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="#" class="navbar-brand">Tweet Map</a>
+        </div>
+        <div id="navbarCollapse" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li id="LoadGraph" ><a  id="LoadGraph2" href="javascript:void(0)" onclick="loadGraph()">Sentiment Over Time</a></li>
+                <li id="WordCloud" ><a id="WordCloud2" href="javascript:void(0)" onclick="loadCloud()">Word Trends</a></li>
+            </ul>        
+        </div>
+    </nav>
+</div>
+<div id="Graph" style="display:none" >
+        <div style="margin-left:35px;">
+            <input type="radio" checked="true" name="group" id="rb1" onclick="setPanSelect()">Select
+            <input type="radio" name="group" id="rb2" onclick="setPanSelect()">Pan
+		</div>
+		<div id="chartdiv" style="width: 100%; height: 400px;"></div>
+</div>
+<div id="wordG" style="display:none"></div>
+  </body>
+</html>

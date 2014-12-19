@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="UTF-8">
+<title>Example of Twitter Bootstrap 3 Static Navbar Extended</title>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<style type="text/css">
+    .bs-example{
+    	margin: 20px;
+    }
+</style>
+    <style type="text/css">
+      html, body, #map-canvas { height: 100%; margin: 0; padding: 0;}
+    </style>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=">
+    </script>
+   <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization"></script>
+    <script type="text/javascript">
+    function initialize() {
+    var heatMapData = [
+                      {location: new google.maps.LatLng(37.782, -122.447), weight: 0.5},
+                      new google.maps.LatLng(37.782, -122.445),
+                      {location: new google.maps.LatLng(37.782, -122.443), weight: -0.3},
+                      {location: new google.maps.LatLng(37.782, -122.441), weight: -0.5},
+                      {location: new google.maps.LatLng(37.782, -122.439), weight: -1},
+                      new google.maps.LatLng(37.782, -122.437),
+                      {location: new google.maps.LatLng(37.782, -122.435), weight: 0.5},
+
+                      {location: new google.maps.LatLng(37.785, -122.447), weight: 0.3},
+                      {location: new google.maps.LatLng(37.785, -122.445), weight: 0.2},
+                      new google.maps.LatLng(37.785, -122.443),
+                      {location: new google.maps.LatLng(37.785, -122.441), weight: 0.5},
+                      new google.maps.LatLng(37.785, -122.439),
+                      {location: new google.maps.LatLng(37.785, -122.437), weight: -1},
+                      {location: new google.maps.LatLng(37.785, -122.435), weight: 1}
+                    ];
+
+                    var sanFrancisco = new google.maps.LatLng(37.774546, -122.433523);
+
+                    map = new google.maps.Map(document.getElementById('map-canvas'), {
+                      center: sanFrancisco,
+                      zoom: 13,
+                      mapTypeId: google.maps.MapTypeId.SATELLITE
+                    });
+
+                    var heatmap = new google.maps.visualization.HeatmapLayer({
+                      data: heatMapData
+                    });
+                    heatmap.setMap(map);
+   
+      function changeGradient() {
+    	  var gradient = [
+    	    'rgba(0, 255, 255, 0)',
+    	    'rgba(0, 255, 255, 1)',
+    	    'rgba(0, 191, 255, 1)',
+    	    'rgba(0, 127, 255, 1)',
+    	    'rgba(0, 63, 255, 1)',
+    	    'rgba(0, 0, 255, 1)',
+    	    'rgba(0, 0, 223, 1)',
+    	    'rgba(0, 0, 191, 1)',
+    	    'rgba(0, 0, 159, 1)',
+    	    'rgba(0, 0, 127, 1)',
+    	    'rgba(63, 0, 91, 1)',
+    	    'rgba(127, 0, 63, 1)',
+    	    'rgba(191, 0, 31, 1)',
+    	    'rgba(255, 0, 0, 1)'
+    	  ]
+    	  heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
+    	}
+      google.maps.event.addDomListener(window, 'load', initialize);
+     
+    </script>
+  </head>
+  <body>
+<div class="bs-example">
+    <nav role="navigation" class="navbar navbar-default">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="#" class="navbar-brand">Tweet Map</a>
+        </div>
+        <!-- Collection of nav links, forms, and other content for toggling -->
+        <div id="navbarCollapse" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="./map.html">Plot Tweets</a></li>
+                <li><a href="./heatMap.html">Heat Map</a></li>
+                <li class="dropdown">
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">Keywords <b class="caret"></b></a>
+                    <ul role="menu" class="dropdown-menu">
+                        <li><a href="#">Bieber</a></li>
+                        <li><a href="#">Modi</a></li>
+                        <li><a href="#">Ebola</a></li>
+                        <li><a href="#">Girl</a></li>
+                        <li><a href="#">Love</a></li>
+                        <li><a href="#">1989</a></li>
+                        <li><a href="#">Suarez</a></li>
+                        <li><a href="#">Apple</a></li>
+                        <li><a href="#">God</a></li>
+                        <li><a href="#">Lol</a></li>
+                        <li><a href="#">Boy</a></li>
+                        <li><a href="#">Baby</a></li>
+                        li><a href="#">omg</a></li>
+                    </ul>
+                </li>
+            </ul>        
+        </div>
+    </nav>
+</div>
+
+				 <div id="tweets"></div>	
+	<div id="map-canvas"></div>				
+  </body>
+</html>

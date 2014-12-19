@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="UTF-8">
+<title>LiveTweetMap</title>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<style type="text/css">
+    .bs-example{
+    	margin: 20px;
+    }
+</style>
+    <style type="text/css">
+      html, body, #map-canvas { height: 100%; margin: 0; padding: 0;}
+    </style>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=">
+    </script>
+    <script type="text/javascript">
+	var keyword = 'all';
+	var globalData = [];
+	var myLatlng = new google.maps.LatLng(-25.363882,131.044922);
+	
+	var mapOptions1 = {
+		zoom: 2,
+			center:myLatlng,
+			mapTypeId: google.maps.MapTypeId.SATELLITE
+	}
+	var mapOptions2 = {
+	    zoom: 2,
+			center:myLatlng,
+			mapTypeId: google.maps.MapTypeId.TERRAIN		
+	}
+	var map, map2, map3;
+	
+    var infowindow=new google.maps.InfoWindow();
+    var markers=[];//for storing markers so we can clear them
+    var marker, i;
+    function hideMarkers() {
+        for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(null); //Remove the marker from the map
+            
+        }
+    }
+    function getTweetsByKeyword( value){
+    	value=value.toLowerCase();
+    	deleteMarkers();
+    	  var arr = [];
+    		var locationArr;
+    		var bounds=new google.maps.LatLngBounds();
+    		//http://localhost:8080/HelloWorldServlet/rest/live-tweets/getAllTweets
+    		//http://localhost:8080/live-tweets/getTweetsByKeyword?hashTag="+value+"&round="+parseInt(map.getZoom()/2-2)+"&count=100
+    		        $.getJSON("rest/live-tweets/getTweetsByKeyword?hashTag="+value+"&round="+parseInt(map.getZoom()/2-2)+"&count=100",function(result){
+    	    		var len = result.length;
+    	    		var i, j, entry;
+    	    		locationArr = new Array(len);
+    	    		for (i=0; i < len ; i++) {
+    	    			locationArr[i] = new Array(3);
+    	    		}
+
+    	    		// Loop through both dimensions
+    	    		for (i = 0; i < locationArr.length; ++i) {
+    	    		    entry = locationArr[i];
+    	    		    entry[0]=result[i].count;
+    	    		    entry[1]=result[i].latitude;
+    	    		    entry[2]=result[i].longitude;
+    	    		}
+    	    		
+    	    	    for (i = 0; i < locationArr.length; i++) {
+    		    	      marker = new google.maps.Marker({
+    		    	          position: new google.maps.LatLng(locationArr[i][1], locationArr[i][2]),
+    		    	          map:map,
+    		                  draggable: false,
+    		                  raiseOnDrag: false,
+    		                  labelContent: ""+locationArr[i][0].toString(),
+    		                  labelAnchor: new google.maps.Point(3, 30),
+    		                  labelClass: "mapIconLabel", // the CSS class for the label
+    		                  labelInBackground: false
+    		    	      });
+    	         		   google.maps.event.addListener(marker, 'click', (function (marker, i) {
+    	         		        return function () {
+    	         		        	var titleStr ="Latitude : " +locationArr[i][1].toString() + ",\n" +
+    	         		        	"Longitude : " +locationArr[i][2].toString() +  ",\n" +
+    	         		        	"TweetsCount : " +locationArr[i][0].toString() +  "\n" ;
+    	         		            infowindow.setContent(titleStr);
+    	         		            infowindow.open(map, marker);
+    	         		        }
+    	         		    })(marker, i));
+    	         		  markers.push(marker);
+    		    	  }//end of for 
+    	        		
+    	    	    directionsDisplay = new google.maps.DirectionsRenderer();
+
+    	    	    directionsDisplay.setMap(map);
+    	    	  });   	    
+    }
+    var map =null;
+      function initialize() {  	
+    	  var x="[{'latitude':-23.63,'longitude':-46.62,'count':1},{'latitude':13.04,'longitude':80.25,'count':1},{'latitude':13.95,'longitude':121.2,'count':1}]";   	  
+    	  var myLatlng = new google.maps.LatLng(38,100);
+        var mapOptions = {
+          center: myLatlng,
+          zoom: 1
+        };
+        clearMarkers = function () {
+        	var l=markers.length;
+        	for(var i=0;i<l;i++)
+        	markers[i].setMap(null);
+        	bounds=new google.maps.LatLngBounds();
+        	};        	
+         map = new google.maps.Map(document.getElementById('map-canvas'),
+            mapOptions);
+
+        google.maps.event.addListener(map, 'click', function() {
+        	updateMap();
+        
+        });// end of map click ... 
+        
+       
+        google.maps.event.addListener(map, 'zoom_changed', function() {
+        	updateMap();
+        });
+      } //end of initialise
+      
+	function updateMap(){
+		clearMarkers();
+    	  
+    	  var arr = [];
+    		var locationArr;
+    		var bounds=new google.maps.LatLngBounds();2
+    	    	  	$.getJSON("rest/live-tweets/getGroupedTweets?round="+parseInt(map.getZoom()/2-2)+"&count=200",function(result){
+    	    		var len = result.length;
+    	    		var i, j, entry;
+    	    		// Create the array
+    	    		locationArr = new Array(len);
+    	    		for (i=0; i < len ; i++) {
+    	    			locationArr[i] = new Array(3);
+    	    		}
+    	    		for (i = 0; i < locationArr.length; ++i) {
+    	    		    entry = locationArr[i];
+    	    		    entry[0]=result[i].count;
+    	    		    entry[1]=result[i].latitude;
+    	    		    entry[2]=result[i].longitude;
+    	    		}
+    	    		
+    	    	    for (i = 0; i < locationArr.length; i++) {
+    		    	      marker = new google.maps.Marker({
+    		    	    	  map:map,
+    		    	          position: new google.maps.LatLng(locationArr[i][1], locationArr[i][2]),
+   		                  draggable: false,
+    		                  raiseOnDrag: false,
+    		                  labelContent: ""+locationArr[i][0].toString(),
+    		                  labelAnchor: new google.maps.Point(3, 30),
+    		                  labelClass: "mapIconLabel", // the CSS class for the label
+    		                  labelInBackground: false
+    		    	      });
+    	         		   google.maps.event.addListener(marker, 'click', (function (marker, i) {
+    	         		        return function () {
+    	         		        	var titleStr ="Latitude : " +locationArr[i][1].toString() + ",\n" +
+    	         		        	"Longitude : " +locationArr[i][2].toString() +  ",\n" +
+    	         		        	"Count : " +locationArr[i][0].toString() +  "\n" ;
+    	         		            infowindow.setContent(titleStr);
+    	         		            infowindow.open(map, marker);
+    	         		        }
+    	         		    })(marker, i));
+    	         		  markers.push(marker);
+    		    	  }//end of for 
+    	    	    directionsDisplay = new google.maps.DirectionsRenderer();
+    	    	    directionsDisplay.setMap(map);
+    	    	  });    
+  }
+      
+      deleteMarkers();
+        var arr = [];
+      	var locationArr;
+     
+        	  	$.getJSON("rest/live-tweets/getGroupedTweets?round=-1&count=200",function(result){
+        		var len = result.length;
+        		var i, j, entry;
+        		locationArr = new Array(len);
+        		for (i=0; i < len ; i++) {
+        			locationArr[i] = new Array(3);
+        		}
+        		for (i = 0; i < locationArr.length; ++i) {
+        		    entry = locationArr[i];
+        		    entry[0]=result[i].count;
+        		    entry[1]=result[i].latitude;
+        		    entry[2]=result[i].longitude;
+        		}
+        	    for (i = 0; i < locationArr.length; i++) {
+      	    	      marker = new google.maps.Marker({
+      	    	          position: new google.maps.LatLng(locationArr[i][1], locationArr[i][2]),
+      	    	          map: map,
+      	                  draggable: false,
+      	                  raiseOnDrag: false,
+      	                  labelContent: ""+locationArr[i][0].toString(),
+      	                  labelAnchor: new google.maps.Point(3, 30),
+      	                  labelClass: "mapIconLabel", // the CSS class for the label
+      	                  labelInBackground: false
+      	    	      });
+             		   google.maps.event.addListener(marker, 'click', (function (marker, i) {
+             		        return function () {
+           		        	var titleStr ="Lat : " +locationArr[i][1].toString() + ",\n" +
+           		        	"Long : " +locationArr[i][2].toString() +  ",\n" +
+           		        	"Count : " +locationArr[i][0].toString() +  "\n" ;
+           		            infowindow.setContent(titleStr);
+             		            infowindow.open(map, marker);
+             		        }
+             		    })(marker, i));
+             		   markers.push(marker);
+      	    	  }
+        	  });//end of ajax call
+        	  directionsDisplay = new google.maps.DirectionsRenderer();
+        	directionsDisplay.setMap(map);
+      function setAllMap(map) {
+        for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(map);
+        }
+      }
+      function clearMarkers() {
+        setAllMap(null);
+      }
+      function showMarkers() {
+        setAllMap(map);
+      }
+      function deleteMarkers() {
+        clearMarkers();
+        markers = [];
+      }  
+      google.maps.event.addDomListener(window, 'load', setupEventSource);   
+      
+      function loadTweetMarkers() {
+    	  if (!$("#tweetMarker").hasClass("active")) {
+        	  $("#tweetMarker").toggleClass("active");
+    	  }
+    	  if ($("#tweetHeat").hasClass("active")) {
+        	  $("#tweetHeat").toggleClass("active");
+    	  }
+    	  if ($("#sentiHeat").hasClass("active")) {
+        	  $("#sentiHeat").toggleClass("active");
+    	  }
+    	  globalData.forEach(function(g) {
+    		  new google.maps.Marker({
+							position : g.location,
+							map : map2
+						}); 
+    	  });
+      }
+      
+      function loadHeatMapForAllTweets() {
+    	  if (!$("#tweetHeat").hasClass("active")) {
+        	  $("#tweetHeat").toggleClass("active");
+    	  }
+    	  if ($("#tweetMarker").hasClass("active")) {
+        	  $("#tweetMarker").toggleClass("active");
+    	  }
+    	  if ($("#sentiHeat").hasClass("active")) {
+        	  $("#sentiHeat").toggleClass("active");
+    	  }
+			
+			/*var pointArray = new google.maps.MVCArray(latlongList);
+			var heatmap = new google.maps.visualization.HeatmapLayer({
+	    		data: pointArray
+	  		});
+	  		heatmap.setMap(map);*/
+      }
+      
+      function loadSentimentHeatMap() {
+    	  if (!$("#sentiHeat").hasClass("active")) {
+        	  $("#sentiHeat").toggleClass("active");
+    	  }
+    	  if ($("#tweetMarker").hasClass("active")) {
+        	  $("#tweetMarker").toggleClass("active");
+    	  }
+    	  if ($("#tweetHeat").hasClass("active")) {
+        	  $("#tweetHeat").toggleClass("active");
+    	  }
+      }
+
+		$("#keywordDrop li a").click(function() {
+    	    keyword = $(this).text();
+    	});
+		
+		function LocationObj(lat, longi, wt) {
+			this.lat = lat;
+			this.longi = longi;
+			this.wt = wt;
+		}
+      
+      function setupEventSource() {
+  		map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions1);
+  		map2 = new google.maps.Map(document.getElementById('map-canvas'), mapOptions2);
+  		map3 = new google.maps.Map(document.getElementById('map-canvas'), mapOptions1);
+  		if (typeof(EventSource) !== "undefined") {
+  				console.log("AAAA");
+    			var source = new EventSource("/TweetUI/twitmapsse");
+    			console.log("Initialized event source");
+    			//source.onmessage = function(event) {
+    				console.log("BBBB");
+    				globalData = [];
+    				var snsMessagesList = "[]\n\n[{\"latitude\":40.535845,\"longitude\":-84.388108,\"category\":\"the\",\"weight\":0.121783},{\"latitude\":39.135546,\"longitude\":-76.621432,\"category\":\"apple\",\"weight\":-0.586476},{\"latitude\":52.150883,\"longitude\":-0.191151,\"category\":\"the\",\"weight\":-0.392669},{\"latitude\":-22.596533,\"longitude\":-47.425719,\"category\":\"love\"},{\"latitude\":6.761443,\"longitude\":3.413829,\"category\":\"the\",\"weight\":0.0},{\"latitude\":38.529391,\"longitude\":-89.96544,\"category\":\"the\",\"weight\":-0.929762},{\"latitude\":38.318257,\"longitude\":-85.703514,\"category\":\"the\",\"weight\":-0.488214},{\"latitude\":39.448959,\"longitude\":-87.421432,\"category\":\"lol\",\"weight\":-0.316197},{\"latitude\":39.448959,\"longitude\":-87.421432,\"category\":\"lol\",\"weight\":-0.316197},{\"latitude\":39.347816,\"longitude\":-76.750542,\"category\":\"the\",\"weight\":-0.282551}]";
+    				
+    				//console.log(event.data);
+    				console.log("ccccc");
+    				//var snsMessagesList = event.data;
+    				var snsMessages = snsMessagesList.split("\n\n");
+    				var locations = [];
+    				snsMessages.forEach(function(msg) {
+    					console.log(msg);
+    					msgjson = JSON.parse(msg);
+    					msgjson.forEach(function(l) {
+    						if (keyword.toLowerCase() == 'all' || category == keyword) {
+    							var obj = new LocationObj(l.latitude, l.longitude, l.weight);
+    							locations.push(obj);
+    						}
+    					});
+    				});
+    				console.log(locations);
+    				locations.forEach(function(l) {
+    					var lObj = new Object();
+    					lObj.location = new google.maps.LatLng(l.latitude, l.longitude);
+    					lObj.weight = l.weight;
+    					globalData.push(lObj);
+    				});
+    				console.log(globalData);
+		
+	  			//}
+    		} else {
+    			output.innerHTML = "Sorry, Server-Sent Event is not supported in your browser";
+  		}
+  	return false;
+  }
+    </script>
+  </head>
+  <body>
+<div class="bs-example">
+    <nav role="navigation" class="navbar navbar-default">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="#" class="navbar-brand">Tweet Map</a>
+        </div>
+        <!-- Collection of nav links, forms, and other content for toggling -->
+        <div id="navbarCollapse" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li id="tweetMarker" class="active"><a href="javascript:void(0)" onClick="loadTweetMarkers()">Plot Tweets</a></li>
+                <li id="tweetHeat"><a href="javascript:void(0)" onClick="loadHeatMapForAllTweets()">Heat Map</a></li>
+                <li id="sentiHeat"><a href="javascript:void(0)" onClick="loadSentimentHeatMap()">Sentiment Heat Map</a></li>
+                <li class="dropdown">
+                    <a data-toggle="dropdown" class="dropdown-toggle" >Keywords <b class="caret"></b></a>
+                    <ul id="keywordDrop" role="menu" class="dropdown-menu">
+                        <li><a href="#" onClick="getTweetsByKeyword('Bieber');return false;">Bieber</a></li>
+                        <li><a href="#" onClick="getTweetsByKeyword('Modi');return false;">Modi</a></li>
+                        <li><a href="#" onClick="getTweetsByKeyword('Ebola');return false;">Ebola</a></li>
+                        <li><a href="#" onClick="getTweetsByKeyword('Girl');return false;">Girl</a></li>
+                        <li><a href="#" onClick="getTweetsByKeyword('Love');return false;">Love</a></li>
+                        <li><a href="#" onClick="getTweetsByKeyword('1989');return false;">1989</a></li>
+                        <li><a href="#" onClick="getTweetsByKeyword('Suarez');return false;">Suarez</a></li>
+                        <li><a href="#" onClick="getTweetsByKeyword('Apple');return false;">Apple</a></li>
+                        <li><a href="#" onClick="getTweetsByKeyword('God');return false;">God</a></li>
+                        <li><a href="#" onClick="getTweetsByKeyword('Lol');return false;">Lol</a></li>
+                        <li><a href="#" onClick="getTweetsByKeyword('Boy');return false;">Boy</a></li>
+                        <li><a href="#" onClick="getTweetsByKeyword('Baby');return false;">Baby</a></li>
+                    </ul>
+                </li>
+            </ul>        
+        </div>
+    </nav>
+</div>
+
+				 <div id="tweets"></div>	
+	<div id="map-canvas" style="width: 1000px; height: 500px; "></div>				
+  </body>
+</html>
