@@ -1,7 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="description" content="" />
+   <meta name="keywords" content="" />
+   <meta name="robots" content="all,index,follow" />
+   <meta name="author" content="" />
+  
 <title>SentimentAnalysis</title>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
@@ -11,6 +16,10 @@
 <script src="amcharts/serial.js" type="text/javascript"></script>
 <script src="d3.js"></script>
 <script src="d3.layout.cloud.js"></script>
+<script type="text/javascript" src="./script/jquery-1.4.min.js"></script>
+<script type="text/javascript" src="./script/common.js"></script>
+<link rel="stylesheet" href="./style/screen.css" type="text/css" media="all" />
+
 
 <style type="text/css">
     .bs-example{
@@ -79,18 +88,24 @@
 
     chart.addListener("dataUpdated", zoomChart);
 	//var nums=[44618,42949,42975,42597,43609];
-	
+	var count = 1;
     function generateChartData() {
         var firstDate = new Date();
+        //var thedate = new Date();
         firstDate.setDate(firstDate.getDate() - 5);
+        var count = 6;
         var nums=[44618,42949,42975,42597,43609];
         for (var i = 1; i <= 5; i++) {
+        	var x = Math.random();
+        	//thedate.setMonth(count);
             // we create date objects here. In your data, you can have date strings
             // and then set format of your dates using chart.dataDateFormat property,
             // however when possible, use date objects, as this will speed up chart rendering.
+            count++;
             var newDate = new Date(firstDate);
+            newDate.setMonth(count, 1);
             newDate.setDate(newDate.getDate() + i);
-
+            //newDate.setMonth(count);
             var visits = Number(nums[i-1]);//numMath.round(Math.random() * 40) - 20;
 
             chartData.push({
@@ -141,6 +156,7 @@
     }
     function loadGraph() {
     	$("#wordG").hide();
+    	$("#wrap").hide();
     	$("#Graph").show();
     	  if ($("#WordCloud2").hasClass("active")) {
        	  $("#WordCloud2").toggleClass("active");
@@ -159,6 +175,7 @@
 
     function loadCloud() {
     	$("#Graph").hide();
+    	$("#wrap").hide();
     	$("#wordG").show();
     	 if ($("#Loadgraph2").hasClass("active")) {
           	  $("#Loadgraph2").toggleClass("active");}
@@ -216,7 +233,26 @@
      	  }
      	 
     }
+    
     </script>
+    
+    <script type="text/javascript">
+function loadNews() {
+	$("#Graph").hide();
+	$("#wordG").hide();
+	$("#wrap").show(); }
+</script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E")); 
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-8632327-1");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+    
   </head>
   <body>
  <div class="bs-example">
@@ -234,6 +270,7 @@
             <ul class="nav navbar-nav">
                 <li id="LoadGraph" ><a  id="LoadGraph2" href="javascript:void(0)" onclick="loadGraph()">Sentiment Over Time</a></li>
                 <li id="WordCloud" ><a id="WordCloud2" href="javascript:void(0)" onclick="loadCloud()">Word Trends</a></li>
+                <li id="NewsBar" class="active"><a href="javascript:void(0)" onclick="loadNews()">News Ticker</a></li>
             </ul>        
         </div>
     </nav>
@@ -246,5 +283,118 @@
 		<div id="chartdiv" style="width: 100%; height: 400px;"></div>
 </div>
 <div id="wordG" style="display:none"></div>
+<div id="wrap" style="display:none">
+		<div id="head" class="block"></div>
+		
+		<div id="content">
+
+			<div id="info" class="block">
+				<ul id="ticker">
+					<li>						
+						<span>"Word":waste</span>
+						<a href="#">
+							"News":@BlueJays24x7 - Toronto wastes early lead as Orioles beat Blue Jays 11-4 - CTV News http://t.co/rIviOB11iU
+						</a>
+					</li>
+					
+					<li>
+						<span>"Word":awesome</span>
+						<a href="#">
+							"News":@RhondaRise - RT @koreycooper: Just heard a Brit Nicole song on headline news:) awesome!
+						</a>
+					</li>
+					
+					<li>						
+						<span>"Word":hell</span>
+						<a href="#">
+							"News":@SASTVNews - Deir Ezzor:Clashes between FSA and Assad forces in Alhuwaiqah district amid regime artillery shelling on the area.
+						</a>
+					</li>
+					
+					<li>						
+						<span>"Word":problem</span>
+						<a href="#">
+							"News":@OnlineNewsDE - Pikante Namensproblematik: Pornoanbieter hinter FyreTV verklagt Amazon wegen Fire TV http://t.co/2bodQq2fLM
+						</a>
+					</li>
+					
+					<li>						
+						<span>"Word":yuk</span>
+						<a href="#">
+							"News":@DragosteCrimson - RT @dkpopnews: Lee Soo Hyuk to star in tvN's new drama 'High School King' http://t.co/YhPo4kK5xP
+						</a>
+					</li>
+					
+					<li>						
+						<span>"Word":amazing</span>
+						<a href="#">
+							"News":@873news - RT @iamichaelakande: @873news It was an amazing #album party with@i_am9ice @tgp_festac						</a>
+					</li>
+					
+					<li>						
+						<span>"Word":happy</span>
+						<a href="#">
+							"News":@SwissB75 - Wow! Waking up to the news that #Penance is an AWARD winning movie just puts a HUGE smile on my dial! So happy for you @stuntwolfe :D
+						</a>
+					</li>	
+					
+					<li>						
+						<span>"Word":ruin</span>
+						<a href="#">
+							"News":@uk24news - RT @justintimeOO: • http://t.co/6LUQAdbPpc • Katy Perry 375 • Katy Perry ruins 5-year-old s birthday party dressed as clown in hidden … htt…
+						</a>
+					</li>
+					
+					
+					<li>						
+						<span>"Word":killed,</span>
+						<a href="#">
+							"News":@Yash_Arora1 - #latestnews 8 killed as Maoists ambush bus carrying poll officials in Dumka - Times of India: NDTV8 killed as ... http://t.co/5isnfkgAdJ}
+						</a>
+					</li>
+					
+
+					<li>
+
+						<span>"Word":love</span>
+						<a href="#">
+							"News":@Bullionadvisor - Netflix Joining Programming Lineup Of 3 U.S. Cable-TV Services http://t.co/NsgbUMaYEp #money #bullion #gold #news, #love, #photography,...
+						</a>
+					</li>
+
+					<li>
+						<span>"Word":thank</span>
+						<a href="#">
+							"News":@TotallyMarana - Timely. Relevant. Accurate. She delivers. RT @StefanieBoe: Giant bowl of cereal for dinner thanks to breaking news. #partylikeajournalist
+						</a>
+					</li>
+
+					<li>
+						<span>"Word":incredible</span>
+						<a href="#">
+							"News":@JenGoulding14 - RT @Pressparty: @Imaginesof5SOS 5 SECONDS OF SUMMER share 'incredible' news: 'We're performing at the Billboard Music Awards'. http://t.co/…
+						</a>
+					</li>
+
+					<li>
+						<span>"Word":congrats</span>
+						<a href="#">
+							"News":@biebertwice - RT @ohbiebernews: kylemassey: A camera, a song, and a dream #playtimeisover congrats to @ryanbutler on KILLING THE VISUAL http://t.co/HwTl8…
+						</a>
+					</li>
+				
+					
+					<li>						
+						<span>Word":terrible</span>
+						<a href="#">
+						"News":@Lurka_UK - “@littlebigmusic: Just waking up to this terrible news. In shock. Thoughts with close friends and family. RIP Rashad.”!?!?!? What!?!?	
+						</a>
+					</li>
+
+				</ul>
+			</div>
+
+		</div>
+	</div>
   </body>
 </html>
